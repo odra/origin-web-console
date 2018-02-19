@@ -93,7 +93,7 @@ function OverviewController($scope,
   var imageStreamsVersion = APIService.getPreferredVersion('imagestreams');
   var limitRangesVersion = APIService.getPreferredVersion('limitranges');
   var podsVersion = APIService.getPreferredVersion('pods');
-  var replicaSetsVersion = APIService.getPreferredVersion('replicasets');
+  //var replicaSetsVersion = APIService.getPreferredVersion('replicasets');
   var replicationControllersVersion = APIService.getPreferredVersion('replicationcontrollers');
   var resourceQuotasVersion = APIService.getPreferredVersion('resourcequotas');
   var routesVersion = APIService.getPreferredVersion('routes');
@@ -104,6 +104,8 @@ function OverviewController($scope,
   var servicesVersion = APIService.getPreferredVersion('services');
   var statefulSetsVersion = APIService.getPreferredVersion('statefulsets');
   var templatesVersion = APIService.getPreferredVersion('templates');
+  //var mobileClientsVersion = APIService.getPreferredVersion('mobileclients');
+
   overview.buildConfigsInstantiateVersion = APIService.getPreferredVersion('buildconfigs/instantiate');
 
 
@@ -204,7 +206,8 @@ function OverviewController($scope,
            _.size(overview.vanillaReplicaSets) +
            _.size(overview.statefulSets) +
            _.size(overview.monopods) +
-           _.size(overview.state.serviceInstances);
+           _.size(overview.state.serviceInstances) + 
+           _.size(overview.mobileClients);
   };
 
   // The size of all visible top-level items after filtering.
@@ -215,7 +218,8 @@ function OverviewController($scope,
            _.size(overview.filteredReplicaSets) +
            _.size(overview.filteredStatefulSets) +
            _.size(overview.filteredMonopods) +
-           _.size(overview.filteredServiceInstances);
+           _.size(overview.filteredServiceInstances) + 
+           _.size(overview.filteredMobileClients);
   };
 
   // Show the "Get Started" message if the project is empty.
@@ -386,6 +390,7 @@ function OverviewController($scope,
     overview.filteredMonopods = filterItems(overview.monopods);
     overview.filteredPipelineBuildConfigs = filterItems(overview.pipelineBuildConfigs);
     overview.filteredServiceInstances = filterItems(state.orderedServiceInstances);
+    overview.filteredMobileClients = filterItems(overview.mobileClients);
     overview.filterActive = isFilterActive();
     updateApps();
     updateShowGetStarted();
@@ -1114,6 +1119,7 @@ function OverviewController($scope,
   });
 
   $scope.browseCatalog = function() {
+    console.log("browseCatalog");
     Navigate.toProjectCatalog($scope.projectName);
   };
 
@@ -1242,6 +1248,14 @@ function OverviewController($scope,
       Logger.log("replicationcontrollers (subscribe)", overview.replicationControllers);
     }));
 
+      //watch mobile CRD
+      watches.push(DataService.watch({group:"mobile.k8s.io",version:"v1alpha1",resource:"mobileclients"},context, function(clients){
+        overview.mobileClients = clients.by("metadata.name");
+        updateFilter();
+        Logger.log("mobileclients (subscribe)", clients);
+      }, {poll: limitWatches, pollInterval: DEFAULT_POLL_INTERVAL}));
+  
+
     watches.push(DataService.watch(deploymentConfigsVersion, context, function(dcData) {
       overview.deploymentConfigs = dcData.by("metadata.name");
       groupReplicationControllers();
@@ -1259,17 +1273,17 @@ function OverviewController($scope,
       Logger.log("deploymentconfigs (subscribe)", overview.deploymentConfigs);
     }));
 
-    watches.push(DataService.watch(replicaSetsVersion, context, function(replicaSetData) {
-      overview.replicaSets = replicaSetData.by('metadata.name');
-      groupReplicaSets();
-      updateServicesForObjects(overview.vanillaReplicaSets);
-      updateServicesForObjects(overview.monopods);
-      updatePodWarnings(overview.vanillaReplicaSets);
-      updateLabelSuggestions(overview.vanillaReplicaSets);
-      groupBindings();
-      updateFilter();
-      Logger.log("replicasets (subscribe)", overview.replicaSets);
-    }));
+    // watches.push(DataService.watch(replicaSetsVersion, context, function(replicaSetData) {
+    //   overview.replicaSets = replicaSetData.by('metadata.name');
+    //   groupReplicaSets();
+    //   updateServicesForObjects(overview.vanillaReplicaSets);
+    //   updateServicesForObjects(overview.monopods);
+    //   updatePodWarnings(overview.vanillaReplicaSets);
+    //   updateLabelSuggestions(overview.vanillaReplicaSets);
+    //   groupBindings();
+    //   updateFilter();
+    //   Logger.log("replicasets (subscribe)", overview.replicaSets);
+    // }));
 
     watches.push(DataService.watch(deploymentsVersion, context, function(deploymentData) {
       deploymentsByUID = deploymentData.by('metadata.uid');
