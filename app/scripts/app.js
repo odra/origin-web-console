@@ -631,6 +631,10 @@ angular
       // content (e.g. using :before pseudo-elements).
       $('body').addClass('ios');
     }
+  })
+  .run(function($rootScope, APIService) {
+    $rootScope.AEROGEAR_MOBILE_ENABLED = !!APIService.apiInfo({ resource: "mobileclients", group: "mobile.k8s.io" });
+    Logger.info("AEROGEAR_MOBILE_ENABLED: " + $rootScope.AEROGEAR_MOBILE_ENABLED);
   });
 
 hawtioPluginLoader.addModule('openshiftConsole');
