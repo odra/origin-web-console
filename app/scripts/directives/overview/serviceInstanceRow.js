@@ -43,6 +43,7 @@
 
     row.serviceBindingsVersion = APIService.getPreferredVersion('servicebindings');
     row.serviceInstancesVersion = APIService.getPreferredVersion('serviceinstances');
+    row.isMobileService = $filter('isMobileService');
 
     var getServiceClass = function() {
       var serviceClassName = ServiceInstancesService.getServiceClassNameForInstance(row.apiObject);
@@ -80,8 +81,13 @@
       if (changes.bindings) {
         row.deleteableBindings = _.reject(row.bindings, 'metadata.deletionTimestamp');
       }
-      if (row.isMobileEnabled && changes.mobileClients) {
+      if (row.isMobileEnabled && changes.mobileClients && row.isMobileService(row.apiObject)) {
         row.hasMobileClients = !_.isEmpty(row.mobileClients);
+        var serviceClass = getServiceClass();
+        var integrations = _.get(serviceClass, "spec.externalMetadata.integrations");
+        if (integrations) {
+          row.integrations = integrations.split(",");
+        }
       }
     };
 

@@ -571,54 +571,6 @@ i();
 };
 }
 
-function MobileClientConfigCtrl(e, t, n) {
-var r = this, a = [];
-r.$onInit = function() {
-function o(e) {
-var t = _(e.by("metadata.name")).filter(function(e) {
-return -1 !== _.findIndex(r.services, {
-metadata: {
-labels: {
-serviceName: _.get(e, "metadata.name")
-}
-}
-});
-}).map(function(e) {
-return {
-id: _.get(e, "metadata.name"),
-name: _.get(e, "metadata.name"),
-type: e.data.type,
-url: e.data.uri,
-config: e.data
-};
-}).value();
-r.prettyConfig = JSON.stringify({
-version: 1,
-clusterName: n.openshift.hostPort,
-namespace: _.get(r, "mobileClient.metadata.namespace"),
-clientId: _.get(r, "mobileClient.metadata.name"),
-services: t
-}, null, "  ");
-}
-var i = {
-namespace: _.get(r, "mobileClient.metadata.namespace")
-};
-t.watch(e.getPreferredVersion("serviceinstances"), i, function(n) {
-r.services = _.filter(n.by("metadata.name"), function(e, t) {
-return -1 === _.indexOf(r.mobileClient.spec.excludedServices, t);
-}), t.list(e.getPreferredVersion("configmaps"), i, o, {
-errorNotification: !1
-});
-}, {
-errorNotification: !1
-}), a.push(t.watch(e.getPreferredVersion("configmaps"), i, o, {
-errorNotification: !1
-}));
-}, r.$onDestroy = function() {
-t.unwatchAll(a);
-};
-}
-
 angular.isUndefined(window.OPENSHIFT_CONSTANTS) && (window.OPENSHIFT_CONSTANTS = {}), angular.extend(window.OPENSHIFT_CONSTANTS, {
 HELP_BASE_URL: "https://docs.openshift.org/latest/",
 HELP: {
