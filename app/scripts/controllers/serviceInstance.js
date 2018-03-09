@@ -11,6 +11,7 @@ angular.module('openshiftConsole')
                                                      Catalog,
                                                      DataService,
                                                      Logger,
+                                                     MobileClientsService,
                                                      ProjectsService,
                                                      SecretsService,
                                                      ServiceInstancesService) {
@@ -20,7 +21,7 @@ angular.module('openshiftConsole')
     $scope.serviceClass = null;
     $scope.serviceClasses = null;
     $scope.editDialogShown = false;
-    $scope.isMobileService = $filter('isMobileService');
+    $scope.isMobileServiceFilter = $filter('isMobileService');
     $scope.isMobileEnabled = $rootScope.AEROGEAR_MOBILE_ENABLED;
 
     $scope.breadcrumbs = [
@@ -186,7 +187,7 @@ angular.module('openshiftConsole')
     };
 
     var updateServiceIntegrations = function() {
-      if ($scope.isMobileEnabled && $scope.isMobileService($scope.serviceInstance)) {
+      if ($scope.isMobileEnabled && $scope.isMobileServiceFilter($scope.serviceInstance)) {
         ServiceInstancesService.fetchServiceClassForInstance($scope.serviceInstance).then(function(serviceClass) {
           var integrations = _.get(serviceClass, "spec.externalMetadata.integrations", []);
           $scope.serviceIntegrations = integrations.split(",");
@@ -197,6 +198,7 @@ angular.module('openshiftConsole')
     var serviceResolved = function(serviceInstance, action) {
       $scope.loaded = true;
       $scope.serviceInstance = serviceInstance;
+      $scope.isMobileService = $scope.isMobileServiceFilter(serviceInstance);
 
       if (action === "DELETED") {
         $scope.alerts["deleted"] = {
@@ -227,6 +229,17 @@ angular.module('openshiftConsole')
               var allBindings = bindingsData.by('metadata.name');
               $scope.bindings = BindingService.getBindingsForResource(allBindings, serviceInstance);
             }));
+
+            if ($scope.isMobileEnabled) {
+              $scope.$watch('isMobileService', function() {
+                if ($scope.isMobileService) {
+                  watches.push(MobileClientsService.watch(context, function(clients) {
+                    $scope.mobileClients = clients.by("metadata.name");
+                    $scope.hasMobileClients = !_.isEmpty($scope.mobileClients);
+                  }));
+                }
+              });
+            }
           }, function(error) {
             $scope.loaded = true;
             $scope.alerts["load"] = {
