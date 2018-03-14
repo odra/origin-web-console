@@ -5,7 +5,7 @@ var N = this, D = t("isIE")();
 e.projectName = a.project;
 var A = a.isHomePage;
 N.catalogLandingPageEnabled = !d.DISABLE_SERVICE_CATALOG_LANDING_PAGE;
-var B = t("annotation"), L = t("canI"), V = t("buildConfigForBuild"), O = t("deploymentIsInProgress"), U = t("imageObjectRef"), F = t("isJenkinsPipelineStrategy"), x = t("isNewerResource"), M = t("label"), q = t("podTemplate"), z = i.getPreferredVersion("buildconfigs"), H = i.getPreferredVersion("builds"), G = i.getPreferredVersion("appliedclusterresourcequotas"), K = i.getPreferredVersion("daemonsets"), W = i.getPreferredVersion("deploymentconfigs"), J = i.getPreferredVersion("deployments"), Q = i.getPreferredVersion("horizontalpodautoscalers"), Y = i.getPreferredVersion("imagestreams"), Z = i.getPreferredVersion("limitranges"), X = i.getPreferredVersion("pods"), ee = i.getPreferredVersion("replicasets"), te = i.getPreferredVersion("replicationcontrollers"), ne = i.getPreferredVersion("resourcequotas"), re = i.getPreferredVersion("routes"), ae = i.getPreferredVersion("servicebindings"), oe = i.getPreferredVersion("clusterserviceclasses"), ie = i.getPreferredVersion("serviceinstances"), se = i.getPreferredVersion("clusterserviceplans"), ce = i.getPreferredVersion("services"), le = i.getPreferredVersion("statefulsets"), ue = i.getPreferredVersion("templates");
+var B = t("annotation"), L = t("canI"), V = t("buildConfigForBuild"), O = t("deploymentIsInProgress"), U = t("imageObjectRef"), F = t("isJenkinsPipelineStrategy"), x = t("isNewerResource"), M = t("label"), q = t("podTemplate"), z = i.getPreferredVersion("buildconfigs"), H = i.getPreferredVersion("builds"), G = i.getPreferredVersion("appliedclusterresourcequotas"), K = i.getPreferredVersion("daemonsets"), W = i.getPreferredVersion("deploymentconfigs"), Q = i.getPreferredVersion("deployments"), J = i.getPreferredVersion("horizontalpodautoscalers"), Y = i.getPreferredVersion("imagestreams"), Z = i.getPreferredVersion("limitranges"), X = i.getPreferredVersion("pods"), ee = i.getPreferredVersion("replicasets"), te = i.getPreferredVersion("replicationcontrollers"), ne = i.getPreferredVersion("resourcequotas"), re = i.getPreferredVersion("routes"), ae = i.getPreferredVersion("servicebindings"), oe = i.getPreferredVersion("clusterserviceclasses"), ie = i.getPreferredVersion("serviceinstances"), se = i.getPreferredVersion("clusterserviceplans"), ce = i.getPreferredVersion("services"), le = i.getPreferredVersion("statefulsets"), ue = i.getPreferredVersion("templates");
 N.buildConfigsInstantiateVersion = i.getPreferredVersion("buildconfigs/instantiate");
 var de, me, pe = {}, fe = {}, ge = {}, ve = N.state = {
 alerts: {},
@@ -202,9 +202,9 @@ _.assign(t, n);
 _.each(N.deployments, Ke);
 }, Je = function() {
 xe(N.replicationControllers), xe(N.replicaSets), xe(N.statefulSets), xe(N.daemonSets), xe(N.monopods);
-}, Qe = _.debounce(function() {
+}, Je = _.debounce(function() {
 e.$evalAsync(function() {
-Je(), He(), We();
+Qe(), He(), We();
 });
 }, 500), Ye = function(e) {
 _.isEmpty(e) || (b.addLabelSuggestionsFromResources(e, pe), "pipeline" !== N.viewBy && b.setLabelSuggestions(pe));
@@ -404,14 +404,14 @@ kind: "DaemonSet"
 i || _.some(N.pods, c) && s();
 };
 jt.push(m.watch(X, r, function(e, t) {
-N.pods = e.by("metadata.name"), et(), a(), Qe(), st(N.monopods), xe(N.monopods), Ye(N.monopods), $e(), t && "ADDED" !== t || l(), S.log("pods (subscribe)", N.pods);
+N.pods = e.by("metadata.name"), et(), a(), Je(), st(N.monopods), xe(N.monopods), Ye(N.monopods), $e(), t && "ADDED" !== t || l(), S.log("pods (subscribe)", N.pods);
 })), jt.push(m.watch(te, r, function(e) {
 N.replicationControllers = e.by("metadata.name"), rt(), st(N.vanillaReplicationControllers), st(N.monopods), xe(N.vanillaReplicationControllers), Ye(N.vanillaReplicationControllers), wt(), $e(), S.log("replicationcontrollers (subscribe)", N.replicationControllers);
 })), jt.push(m.watch(W, r, function(e) {
 N.deploymentConfigs = e.by("metadata.name"), rt(), st(N.deploymentConfigs), st(N.vanillaReplicationControllers), Ye(N.deploymentConfigs), We(), bt(), St(), wt(), $e(), S.log("deploymentconfigs (subscribe)", N.deploymentConfigs);
 })), jt.push(m.watch(ee, r, function(e) {
 N.replicaSets = e.by("metadata.name"), ot(), st(N.vanillaReplicaSets), st(N.monopods), xe(N.vanillaReplicaSets), Ye(N.vanillaReplicaSets), wt(), $e(), S.log("replicasets (subscribe)", N.replicaSets);
-})), jt.push(m.watch(J, r, function(e) {
+})), jt.push(m.watch(Q, r, function(e) {
 de = e.by("metadata.uid"), N.deployments = _.sortBy(de, "metadata.name"), ot(), st(N.deployments), st(N.vanillaReplicaSets), Ye(N.deployments), wt(), $e(), S.log("deployments (subscribe)", N.deploymentsByUID);
 })), jt.push(m.watch(H, r, function(e) {
 ve.builds = e.by("metadata.name"), Ct(), S.log("builds (subscribe)", ve.builds);
@@ -437,7 +437,7 @@ N.buildConfigs = e.by("metadata.name"), pt(), bt(), Ct(), $e(), S.log("buildconf
 }, {
 poll: D,
 pollInterval: 6e4
-})), jt.push(m.watch(Q, r, function(e) {
+})), jt.push(m.watch(J, r, function(e) {
 N.horizontalPodAutoscalers = e.by("metadata.name"), ut(), S.log("autoscalers (subscribe)", N.horizontalPodAutoscalers);
 }, {
 poll: D,
