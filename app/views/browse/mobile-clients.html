@@ -1,4 +1,4 @@
-<div class="middle">
+<div class="middle mobile-clients-view">
   <div class="middle-header">
     <div class="container-fluid">
       <breadcrumbs breadcrumbs="breadcrumbs"></breadcrumbs>
@@ -41,7 +41,20 @@
           <uib-tabset>
             <uib-tab active="selectedTab.configuration">
               <uib-tab-heading>Configuration</uib-tab-heading>
-              <pre>{{ctrl.mobileClient | json}}</pre>
+              <div class="row">
+                <div class="col-md-6">
+                  <mobile-client-config mobile-client="ctrl.mobileClient" project-name=ctrl.projectName></mobile-client-config>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <mobile-client-service-associations
+                    mobile-client="ctrl.mobileClient"
+                    project="ctrl.projectName"
+                    service-classes=ctrl.serviceClasses>
+                  </mobile-client-service-associations>
+                </div>
+              </div>
             </uib-tab>
             <uib-tab active="selectedTab.sdkSetup" ng-if="ctrl.mobileClient">
               <uib-tab-heading>SDK setup</uib-tab-heading>
