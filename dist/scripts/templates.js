@@ -5698,36 +5698,6 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
   );
 
 
-  $templateCache.put('views/directives/_service-integration.html',
-    "<div class=\"service-integration pull-left\" ng-if=\"$ctrl.integration\">\n" +
-    "<div ng-class=\"{active: $ctrl.getState() == 'active',\n" +
-    "                  inactive: $ctrl.getState() == 'no-binding',\n" +
-    "                  unknown: $ctrl.getState() == 'no-service'}\" class=\"integration\">\n" +
-    "<img class=\"image-icon pull-left\" ng-src=\"{{ $ctrl.integration.spec.externalMetadata.imageUrl }}\">\n" +
-    "<div class=\"description pull-left\" ng-switch=\"$ctrl.getState()\">\n" +
-    "<h4 class=\"integration-name\">{{$ctrl.integration.spec.externalMetadata.displayName || \"Service Integration\"}}</h4>\n" +
-    "<span class=\"integration-error\" ng-if=\"$ctrl.getState() == 'pending' || $ctrl.getState() == 'service-provision-pending' || $ctrl.getState() == 'service-deprovision-pending'\"><span class=\"spinner spinner-xs spinner-inline\" aria-hidden=\"true\"></span></span>\n" +
-    "<delete-link class=\"inline-delete\" ng-if=\"$ctrl.getState() == 'active'\" kind=\"servicebinding\" group=\"servicecatalog.k8s.io\" button-only=\"true\" stay-on-current-page=\"true\" resource-name=\"{{$ctrl.binding.metadata.name}}\" project-name=\"{{$ctrl.binding.metadata.namespace}}\" success=\"$ctrl.deletePodPreset\">\n" +
-    "</delete-link>\n" +
-    "<div class=\"id\" ng-switch-when=\"pending\">Status: Pending</div>\n" +
-    "<div class=\"id\" ng-switch-when=\"active\">ID: {{ $ctrl.binding.metadata.name }}</div>\n" +
-    "<div class=\"id\" ng-switch-when=\"no-binding\">No {{$ctrl.integration.spec.externalMetadata.displayName}} integration found.\n" +
-    "<span ng-click=\"$ctrl.openIntegrationPanel()\" class=\"integrate-link\">Integrate {{$ctrl.integration.spec.externalMetadata.displayName}}</span>\n" +
-    "</div>\n" +
-    "<div class=\"id\" ng-switch-when=\"service-provision-pending\">Waiting for {{$ctrl.integration.spec.externalMetadata.displayName}} provision to complete.</div>\n" +
-    "<div class=\"id\" ng-switch-when=\"service-deprovision-pending\">Waiting for {{$ctrl.integration.spec.externalMetadata.displayName}} deprovision to complete.</div>\n" +
-    "<div class=\"id\" ng-switch-when=\"no-service\">\n" +
-    "<span ng-click=\"$ctrl.provision()\">Provision {{$ctrl.integration.spec.externalMetadata.displayName}} to enable integration.</span>\n" +
-    "</div>\n" +
-    "</div>\n" +
-    "</div>\n" +
-    "</div>\n" +
-    "<overlay-panel show-panel=\"$ctrl.integrationPanelVisible\" handle-close=\"$ctrl.closeIntegrationPanel\">\n" +
-    "<bind-service target=\"providerServiceInstance\" project=\"$ctrl.project\" on-close=\"$ctrl.closeIntegrationPanel\" on-finish=\"$ctrl.onBind\" parameter-data=\"$ctrl.parameterData\"></bind-service>\n" +
-    "</overlay-panel>"
-  );
-
-
   $templateCache.put('views/directives/_status-icon.html',
     "<span ng-switch=\"status\" class=\"hide-ng-leave status-icon\">\n" +
     "<span ng-switch-when=\"Cancelled\" class=\"fa fa-ban text-muted\" aria-hidden=\"true\"></span>\n" +
@@ -7892,6 +7862,66 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
   );
 
 
+  $templateCache.put('views/directives/mobile-clent-integrations.html',
+    "<div ng-if=\"($ctrl.integrationsData | size)\" class=\"row mobile-integrations\">\n" +
+    "<div class=\"component-label section-label\">Integrations</div>\n" +
+    "<mobile-client-integration ng-repeat=\"integration in $ctrl.integrationsData\" integration=\"integration\" mobile-client=\"$ctrl.mobileClient\">\n" +
+    "</mobile-client-integration>\n" +
+    "</div>"
+  );
+
+
+  $templateCache.put('views/directives/mobile-integration.html',
+    "<div class=\"mobile-integration pull-left\" ng-if=\"$ctrl.serviceClass\">\n" +
+    "<div ng-class=\"{'no-instance': !($ctrl.integrationServiceInstance | isServiceInstanceReady) && !($ctrl.serviceProvisioning || $ctrl.serviceDeprovisioning) && !($ctrl.integrationServiceInstance | isServiceInstanceFailed),\n" +
+    "                  'instance-error': ($ctrl.integrationServiceInstance | isServiceInstanceFailed)}\" class=\"integration\">\n" +
+    "<img ng-if=\"$ctrl.serviceClass.spec.externalMetadata.imageUrl\" class=\"integration-icon image pull-left\" ng-src=\"{{ $ctrl.serviceClass.spec.externalMetadata.imageUrl }}\">\n" +
+    "<div ng-if=\"$ctrl.serviceClass.spec.externalMetadata['console.openshift.io/iconClass']\" class=\"pull-left\">\n" +
+    "<span class=\"{{$ctrl.serviceClass.spec.externalMetadata['console.openshift.io/iconClass']}} integration-icon icon\"></span>\n" +
+    "</div>\n" +
+    "<div class=\"description pull-left\">\n" +
+    "<h4 class=\"integration-name\">{{$ctrl.serviceClass.spec.externalMetadata.displayName || \"Service Integration\"}}</h4>\n" +
+    "<span class=\"integration-error\" ng-if=\"$ctrl.isIntegrationPending || $ctrl.serviceProvisioning || $ctrl.serviceDeprovisioning\">\n" +
+    "<span class=\"spinner spinner-xs spinner-inline\" aria-hidden=\"true\"></span>\n" +
+    "</span>\n" +
+    "<delete-link class=\"inline-delete\" ng-if=\"$ctrl.hasIntegration\" kind=\"servicebinding\" group=\"servicecatalog.k8s.io\" button-only=\"true\" stay-on-current-page=\"true\" resource-name=\"{{$ctrl.binding.metadata.name}}\" project-name=\"{{$ctrl.binding.metadata.namespace}}\" success=\"$ctrl.onDelete\">\n" +
+    "</delete-link>\n" +
+    "<div class=\"id\" ng-if=\"$ctrl.isIntegrationPending && !($ctrl.serviceProvisioning || $ctrl.serviceDeprovisioning)\">Status: Pending</div>\n" +
+    "<div class=\"id\" ng-if=\"($ctrl.integrationServiceInstance | isServiceInstanceReady) && (!$ctrl.isIntegrationPending && $ctrl.hasIntegration)\">ID: {{ $ctrl.binding.metadata.name }}</div>\n" +
+    "<div class=\"id\" ng-if=\"($ctrl.integrationServiceInstance | isServiceInstanceReady) && (!$ctrl.isIntegrationPending && !$ctrl.hasIntegration)\">No {{$ctrl.serviceClass.spec.externalMetadata.displayName}} integration found.\n" +
+    "<span ng-click=\"$ctrl.openIntegrationPanel()\" class=\"integrate-link\">Integrate {{$ctrl.serviceClass.spec.externalMetadata.displayName}}</span>\n" +
+    "</div>\n" +
+    "<div class=\"id\" ng-if=\"$ctrl.serviceProvisioning\">Waiting for {{$ctrl.serviceClass.spec.externalMetadata.displayName}} provision to complete.</div>\n" +
+    "<div class=\"id\" ng-if=\"$ctrl.serviceDeprovisioning\">Waiting for {{$ctrl.serviceClass.spec.externalMetadata.displayName}} deprovision to complete.</div>\n" +
+    "<div class=\"id\" ng-if=\"!$ctrl.integrationServiceInstance\">\n" +
+    "<span ng-click=\"$ctrl.provision()\">Provision {{$ctrl.serviceClass.spec.externalMetadata.displayName}} to enable integration.</span>\n" +
+    "</div>\n" +
+    "<div class=\"id\" ng-if=\"$ctrl.integrationServiceInstance && ($ctrl.integrationServiceInstance | isServiceInstanceFailed) && !($ctrl.serviceProvisioning || $ctrl.serviceDeprovisioning)\">\n" +
+    "<span class=\"pficon pficon-error-circle-o\" aria-hidden=\"true\"></span><span>Error: Deprovision {{$ctrl.serviceClass.spec.externalMetadata.displayName}} and reprovision.</span></div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "<overlay-panel show-panel=\"$ctrl.integrationPanelVisible\" handle-close=\"$ctrl.closeIntegrationPanel\">\n" +
+    "<bind-service target=\"$ctrl.integrationServiceInstance\" project=\"$ctrl.project\" on-close=\"$ctrl.closeIntegrationPanel\" on-finish=\"$ctrl.onCreate\" parameter-data=\"$ctrl.parameterData\" binding-meta=\"$ctrl.bindingMeta\"></bind-service>\n" +
+    "</overlay-panel>"
+  );
+
+
+  $templateCache.put('views/directives/mobile-integrations.html',
+    "<mobile-integration parameter-data=\"$ctrl.parameterData\" binding-meta=\"$ctrl.bindingMeta\" binding=\"$ctrl.binding\" project-name=\"$ctrl.projectName\" has-integration=\"$ctrl.hasIntegration\" service-class=\"$ctrl.integration\" is-integration-pending=\"$ctrl.isIntegrationPending\" on-delete=\"$ctrl.delete\" on-create=\"$ctrl.create\">\n" +
+    "</mobile-integration>"
+  );
+
+
+  $templateCache.put('views/directives/mobile-service-integrations.html',
+    "<div ng-if=\"($ctrl.integrationsData | size)\" class=\"row mobile-integrations\">\n" +
+    "<div class=\"component-label section-label\">Integrations</div>\n" +
+    "<mobile-service-integration ng-repeat=\"integration in $ctrl.integrationsData\" integration=\"integration\" consumer-service=\"$ctrl.consumerService\">\n" +
+    "</mobile-service-integration>\n" +
+    "</div>"
+  );
+
+
   $templateCache.put('views/directives/next-steps.html',
     "<div ng-controller=\"TasksController\">\n" +
     "<div ng-if=\"$ctrl.pendingTasks(tasks()).length\">\n" +
@@ -9412,15 +9442,6 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "<overlay-panel show-panel=\"$ctrl.overlayPanelVisible\" handle-close=\"$ctrl.closeOverlayPanel\">\n" +
     "<bind-service target=\"$ctrl.serviceInstance\" project=\"$ctrl.project\" on-close=\"$ctrl.closeOverlayPanel\"></bind-service>\n" +
     "</overlay-panel>"
-  );
-
-
-  $templateCache.put('views/directives/service-instance-integrations.html',
-    "<div ng-if=\"($ctrl.integrationsData | size)\" class=\"row service-integrations\">\n" +
-    "<div class=\"component-label section-label\">Integrations</div>\n" +
-    "<service-integration ng-repeat=\"integration in $ctrl.integrationsData\" integration=\"integration\" consumer-service=\"$ctrl.consumerService\">\n" +
-    "</service-integration>\n" +
-    "</div>"
   );
 
 
@@ -12756,6 +12777,8 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "</div>\n" +
     "</div>\n" +
     "</div>\n" +
+    "<mobile-client-integrations mobile-client=\"row.apiObject\">\n" +
+    "</mobile-client-integrations>\n" +
     "<div ng-if=\"loading\">\n" +
     "Loading...\n" +
     "</div>\n" +
@@ -13042,8 +13065,8 @@ angular.module('openshiftConsoleTemplates', []).run(['$templateCache', function(
     "</service-instance-bindings>\n" +
     "</div>\n" +
     "<div ng-if=\"row.integrations | size\">\n" +
-    "<service-instance-integrations ng-if=\"row.instanceStatus === 'ready'\" is-overview=\"true\" integrations=\"row.integrations\" consumer-service=\"row.apiObject\">\n" +
-    "</service-instance-integrations>\n" +
+    "<mobile-service-integrations ng-if=\"row.instanceStatus === 'ready'\" is-overview=\"true\" integrations=\"row.integrations\" consumer-service=\"row.apiObject\">\n" +
+    "</mobile-service-integrations>\n" +
     "</div>\n" +
     "</div>\n" +
     "</div>\n" +

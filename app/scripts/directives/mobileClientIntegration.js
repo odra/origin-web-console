@@ -23,7 +23,6 @@
     var ctrl = this;
 
     var bindingPreferredVersion = APIService.getPreferredVersion('servicebindings');
-    var configMapPreferredVersion = APIService.getPreferredVersion('configmaps');
     var isBindingReady = $filter('isBindingReady');
     var watches = [];
 

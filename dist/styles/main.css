@@ -2498,7 +2498,7 @@ td>.progress:first-child:last-child{margin-bottom:0;margin-top:3px}
 .datepicker .cw{font-size:10px;width:12px;padding:0 2px 0 5px;vertical-align:middle}
 .input-daterange{width:100%}
 .input-daterange input{text-align:center}
-.input-daterange .input-group-addon{width:auto;min-width:16px;border-width:1px 0;margin-left:-5px;margin-right:-5px}
+.input-daterange .input-group-addon{width:auto;min-width:16px;text-shadow:0 1px 0 #fff;border-width:1px 0;margin-left:-5px;margin-right:-5px}
 select.bs-select-hidden,select.selectpicker{display:none!important}
 .bootstrap-select{width:220px\9}
 .bootstrap-select>.dropdown-toggle{width:100%;padding-right:25px;z-index:1}
@@ -5135,21 +5135,23 @@ pre.clipped.scroll{max-height:150px;overflow:auto;width:100%}
 70%{transform:scale(.66)}
 100%{opacity:.33;z-index:1}
 }
-.service-integrations .component-label.section-label{margin:0 20px}
-.service-integrations .integrate-link{color:#0088ce;cursor:pointer}
-.service-integrations .service-integration{height:40px;margin:10px 20px 0 0}
-.service-integrations .service-integration .image-icon{padding-top:5px;margin:0 15px;width:30px}
+.mobile-integrations .component-label.section-label{margin:0 20px}
+.mobile-integrations .integrate-link{color:#0088ce;cursor:pointer}
+.mobile-integrations .mobile-integration{height:40px;margin:10px 20px 0 0}
+.mobile-integrations .mobile-integration .integration-icon{padding-top:5px;margin:0 15px;width:30px}
 .layout-pf.layout-pf-fixed .container-pf-nav-pf-vertical .middle-header,.list-pf-content .alert-wrapper:last-child{margin-bottom:20px}
-.service-integrations .service-integration .id{color:#757575}
-.service-integrations .service-integration .integration,.service-integrations .service-integration .integration.active .pficon-error-circle-o:before{color:#0088ce}
-.service-integrations .service-integration .inline-delete{display:inline-block}
-.service-integrations .service-integration .integration .integration-name{display:inline}
-.service-integrations .service-integration .integration.active .pficon-error-circle-o{cursor:pointer}
-.service-integrations .service-integration .integration .description .inline-delete .fa-trash-o{font-family:PatternFlyIcons-webfont;color:#363636;background-color:#fff}
-.service-integrations .service-integration .integration .description .inline-delete .fa-trash-o:before{content:"\e611"}
-.service-integrations .service-integration .integration.inactive .pficon-add-circle-o{cursor:pointer}
-.service-integrations .service-integration .integration.unknown .description h4{color:#757575}
-.service-integrations .service-integration .integration.unknown .id{color:#0088ce;cursor:pointer}
+.mobile-integrations .mobile-integration .integration-icon.icon{font-size:30px;color:#363636}
+.mobile-integrations .mobile-integration .id{color:#757575}
+.mobile-integrations .mobile-integration .inline-delete{display:inline-block}
+.mobile-integrations .mobile-integration .integration{color:#0088ce}
+.mobile-integrations .mobile-integration .integration .integration-name{display:inline}
+.mobile-integrations .mobile-integration .integration .description .integration-error{vertical-align:middle}
+.mobile-integrations .mobile-integration .integration .description .inline-delete{margin-left:3px}
+.mobile-integrations .mobile-integration .integration .description .inline-delete .fa-trash-o{font-family:PatternFlyIcons-webfont;color:#363636;background-color:#fff}
+.mobile-integrations .mobile-integration .integration .description .inline-delete .fa-trash-o:before{content:"\e611"}
+.mobile-integrations .mobile-integration .integration.no-instance .description h4{color:#757575}
+.mobile-integrations .mobile-integration .integration.no-instance .id{color:#0088ce;cursor:pointer}
+.mobile-integrations .mobile-integration .integration.instance-error .pficon-error-circle-o{margin-right:5px}
 .layout-pf.layout-pf-fixed{height:1px}
 .layout-pf.layout-pf-fixed body{height:1px;padding-top:41px}
 .layout-pf.layout-pf-fixed .container-pf-nav-pf-vertical,.layout-pf.layout-pf-fixed .container-pf-nav-pf-vertical .view{height:100%}

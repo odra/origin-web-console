@@ -31121,6 +31121,10 @@ updateNavArrows: function() {
 if (this._allow_update) {
 var e, t, n = new Date(this.viewDate), i = n.getUTCFullYear(), r = n.getUTCMonth(), o = this.o.startDate !== -1 / 0 ? this.o.startDate.getUTCFullYear() : -1 / 0, a = this.o.startDate !== -1 / 0 ? this.o.startDate.getUTCMonth() : -1 / 0, s = this.o.endDate !== 1 / 0 ? this.o.endDate.getUTCFullYear() : 1 / 0, l = this.o.endDate !== 1 / 0 ? this.o.endDate.getUTCMonth() : 1 / 0, c = 1;
 switch (this.viewMode) {
+case 0:
+e = i <= o && r <= a, t = i >= s && r >= l;
+break;
+
 case 4:
 c *= 10;
 
@@ -31131,11 +31135,7 @@ case 2:
 c *= 10;
 
 case 1:
-e = Math.floor(i / c) * c < o, t = Math.floor(i / c) * c + c > s;
-break;
-
-case 0:
-e = i <= o && r < a, t = i >= s && r > l;
+e = Math.floor(i / c) * c <= o, t = Math.floor(i / c) * c + c >= s;
 }
 this.picker.find(".prev").toggleClass("disabled", e), this.picker.find(".next").toggleClass("disabled", t);
 }
@@ -31255,11 +31255,6 @@ return e.valueOf();
 });
 e.each(this.pickers, function(e, n) {
 n.setRange(t);
-});
-},
-clearDates: function() {
-e.each(this.pickers, function(e, t) {
-t.clearDates();
 });
 },
 dateUpdated: function(n) {
@@ -31481,7 +31476,7 @@ footTemplate: '<tfoot><tr><th colspan="7" class="today"></th></tr><tr><th colspa
 };
 v.template = '<div class="datepicker"><div class="datepicker-days"><table class="table-condensed">' + v.headTemplate + "<tbody></tbody>" + v.footTemplate + '</table></div><div class="datepicker-months"><table class="table-condensed">' + v.headTemplate + v.contTemplate + v.footTemplate + '</table></div><div class="datepicker-years"><table class="table-condensed">' + v.headTemplate + v.contTemplate + v.footTemplate + '</table></div><div class="datepicker-decades"><table class="table-condensed">' + v.headTemplate + v.contTemplate + v.footTemplate + '</table></div><div class="datepicker-centuries"><table class="table-condensed">' + v.headTemplate + v.contTemplate + v.footTemplate + "</table></div></div>", e.fn.datepicker.DPGlobal = v, e.fn.datepicker.noConflict = function() {
 return e.fn.datepicker = h, this;
-}, e.fn.datepicker.version = "1.8.0", e.fn.datepicker.deprecated = function(e) {
+}, e.fn.datepicker.version = "1.7.1", e.fn.datepicker.deprecated = function(e) {
 var t = window.console;
 t && t.warn && t.warn("DEPRECATED: " + e);
 }, e(document).on("focus.datepicker.data-api click.datepicker.data-api", '[data-provide="datepicker"]', function(t) {
@@ -75680,33 +75675,35 @@ type: "Opaque",
 stringData: {}
 };
 return i.stringData.parameters = JSON.stringify(t), i;
-}, d = function(e, t, n) {
-var i = e.metadata.name, r = c(e.metadata.name + "-credentials-"), o = {
+}, d = function(e, t, n, i) {
+var r = e.metadata.name;
+i = _.assign({
+generateName: r + "-"
+}, i);
+var o = c(e.metadata.name + "-credentials-"), a = {
 kind: "ServiceBinding",
 apiVersion: "servicecatalog.k8s.io/v1beta1",
-metadata: {
-generateName: i + "-"
-},
+metadata: i,
 spec: {
 instanceRef: {
-name: i
+name: r
 },
-secretName: r
+secretName: o
 }
 };
-n && (o.spec.parametersFrom = [ {
+n && (a.spec.parametersFrom = [ {
 secretKeyRef: {
 name: n,
 key: "parameters"
 }
 } ]);
-var a = _.get(t, "spec.selector");
-return a && (a.matchLabels || a.matchExpressions || (a = {
-matchLabels: a
-}), o.spec.alphaPodPresetTemplate = {
-name: r,
-selector: a
-}), o;
+var s = _.get(t, "spec.selector");
+return s && (s.matchLabels || s.matchExpressions || (s = {
+matchLabels: s
+}), a.spec.alphaPodPresetTemplate = {
+name: o,
+selector: s
+}), a;
 }, h = function(t, n, i) {
 if (!t || !n || !i) return !1;
 if (_.get(t, "metadata.deletionTimestamp")) return !1;
@@ -75729,18 +75726,18 @@ return n ? t[n] : null;
 },
 makeParametersSecret: u,
 generateSecretName: c,
-bindService: function(e, t, n, i) {
-var o;
-_.isEmpty(i) || (o = c(e.metadata.name + "-bind-parameters-"));
-var l = d(e, t, o), h = {
+bindService: function(e, t, n, i, o) {
+var l;
+_.isEmpty(i) || (l = c(e.metadata.name + "-bind-parameters-"));
+var h = d(e, t, l, o), f = {
 namespace: e.metadata.namespace
-}, f = r.create(a, null, l, h);
-return o ? f.then(function(e) {
-var t = u(o, i, e);
-return r.create(s, null, t, h).then(function() {
+}, p = r.create(a, null, h, f);
+return l ? p.then(function(e) {
+var t = u(l, i, e);
+return r.create(s, null, t, f).then(function() {
 return e;
 });
-}) : f;
+}) : p;
 },
 isServiceBindable: h,
 getPodPresetSelectorsForBindings: f,
@@ -76943,7 +76940,7 @@ closeTooltip: "x"
 },
 cancelTour: u
 };
-}), angular.module("openshiftCommonUI").factory("HTMLService", [ "BREAKPOINTS", function(e) {
+}), angular.module("openshiftCommonUI").factory("HTMLService", [ "$sanitize", "BREAKPOINTS", function(e, t) {
 return {
 WINDOW_SIZE_XXS: "xxs",
 WINDOW_SIZE_XS: "xs",
@@ -76951,51 +76948,51 @@ WINDOW_SIZE_SM: "sm",
 WINDOW_SIZE_MD: "md",
 WINDOW_SIZE_LG: "lg",
 getBreakpoint: function() {
-return window.innerWidth < e.screenXsMin ? "xxs" : window.innerWidth < e.screenSmMin ? "xs" : window.innerWidth < e.screenMdMin ? "sm" : window.innerWidth < e.screenLgMin ? "md" : "lg";
+return window.innerWidth < t.screenXsMin ? "xxs" : window.innerWidth < t.screenSmMin ? "xs" : window.innerWidth < t.screenMdMin ? "sm" : window.innerWidth < t.screenLgMin ? "md" : "lg";
 },
-isWindowBelowBreakpoint: function(t) {
-switch (t) {
+isWindowBelowBreakpoint: function(e) {
+switch (e) {
 case "xxs":
 return !1;
 
 case "xs":
-return window.innerWidth < e.screenXsMin;
+return window.innerWidth < t.screenXsMin;
 
 case "sm":
-return window.innerWidth < e.screenSmMin;
+return window.innerWidth < t.screenSmMin;
 
 case "md":
-return window.innerWidth < e.screenMdMin;
+return window.innerWidth < t.screenMdMin;
 
 case "lg":
-return window.innerWidth < e.screenLgMin;
+return window.innerWidth < t.screenLgMin;
 
 default:
 return !0;
 }
 },
-isWindowAboveBreakpoint: function(t) {
-switch (t) {
+isWindowAboveBreakpoint: function(e) {
+switch (e) {
 case "xs":
-return window.innerWidth >= e.screenXsMin;
+return window.innerWidth >= t.screenXsMin;
 
 case "sm":
-return window.innerWidth >= e.screenSmMin;
+return window.innerWidth >= t.screenSmMin;
 
 case "md":
-return window.innerWidth >= e.screenMdMin;
+return window.innerWidth >= t.screenMdMin;
 
 case "lg":
-return window.innerWidth >= e.screenLgMin;
+return window.innerWidth >= t.screenLgMin;
 
 default:
 return !0;
 }
 },
-linkify: function(e, t, n) {
-return e ? (n || (e = _.escape(e)), e.replace(/https?:\/\/[A-Za-z0-9._%+-]+[^\s<]*[^\s.,()\[\]{}<>"\u201d\u2019]/gm, function(e) {
-return t ? '<a href="' + e + '" target="' + t + '">' + e + ' <i class="fa fa-external-link" aria-hidden="true"></i></a>' : '<a href="' + e + '">' + e + "</a>";
-})) : e;
+linkify: function(t, n, i) {
+return t ? (i || (t = _.escape(t)), e(t.replace(/https?:\/\/[A-Za-z0-9._%+-]+[^\s<]*[^\s.,()\[\]{}<>"\u201d\u2019]/gm, function(e) {
+return n ? '<a href="' + e + '" target="' + n + '">' + e + ' <i class="fa fa-external-link" aria-hidden="true"></i></a>' : '<a href="' + e + '">' + e + "</a>";
+}))) : t;
 }
 };
 } ]), angular.module("openshiftCommonUI").provider("NotificationsService", function() {
@@ -79376,7 +79373,7 @@ e.exports = '<div class="order-service-config">\n  <div class="config-top">\n   
 }, function(e, t) {
 e.exports = '<div class="order-service-config">\n  <bind-service-form service-class="$ctrl.serviceClass.resource"\n                     show-pod-presets="$ctrl.showPodPresets"\n                     applications="$ctrl.applications"\n                     form-name="$ctrl.forms.bindForm"\n                     allow-no-binding="true"\n                     project-name="$ctrl.projectDisplayName"\n                     bind-type="$ctrl.bindType"\n                     app-to-bind="$ctrl.appToBind">\n  </bind-service-form>\n</div>\n';
 }, function(e, t) {
-e.exports = '<div class="order-service-config">\n  <div class="config-top">\n    <form name="$ctrl.forms.orderConfigureForm" class="config-form">\n      <select-project ng-if="!$ctrl.addToProject" selected-project="$ctrl.selectedProject" name-taken="$ctrl.projectNameTaken" show-divider="$ctrl.parameterSchema.properties.length > 0"></select-project>\n      <catalog-parameters\n        ng-if="$ctrl.parameterSchema.properties && !$ctrl.noProjectsCantCreate"\n        model="$ctrl.parameterData"\n        parameter-schema="$ctrl.parameterSchema"\n        parameter-form-definition="$ctrl.parameterFormDefinition">\n      </catalog-parameters>\n    </form>\n    <div ng-if="$ctrl.error" class="has-error">\n      <span class="help-block">{{$ctrl.error}}</span>\n    </div>\n  </div>\n</div>\n';
+e.exports = '<div class="order-service-config">\n  <div class="config-top">\n    <form name="$ctrl.forms.orderConfigureForm" class="config-form">\n      <select-project ng-if="!$ctrl.addToProject"\n                      selected-project="$ctrl.selectedProject"\n                      name-taken="$ctrl.projectNameTaken"\n                      show-divider="$ctrl.parameterSchema.properties | size"></select-project>\n      <catalog-parameters\n        ng-if="$ctrl.parameterSchema.properties && !$ctrl.noProjectsCantCreate"\n        model="$ctrl.parameterData"\n        parameter-schema="$ctrl.parameterSchema"\n        parameter-form-definition="$ctrl.parameterFormDefinition">\n      </catalog-parameters>\n    </form>\n    <div ng-if="$ctrl.error" class="has-error">\n      <span class="help-block">{{$ctrl.error}}</span>\n    </div>\n  </div>\n</div>\n';
 }, function(e, t) {
 e.exports = '<div class="order-service-details">\n  <div class="order-service-details-top" ng-class="{\'order-service-details-top-icon-top\': $ctrl.serviceClass.vendor || $ctrl.docUrl || $ctrl.supportUrl}">\n    <div class="service-icon">\n      <span ng-if="!$ctrl.imageUrl" class="icon {{$ctrl.iconClass}}" aria-hidden="true"></span>\n      <span ng-if="$ctrl.imageUrl" class="image"><img ng-src="{{$ctrl.imageUrl}}" alt=""></span>\n    </div>\n    <div class="service-title-area">\n      <div class="service-title">\n        {{$ctrl.serviceName}}\n      </div>\n      <div ng-if="$ctrl.serviceClass.vendor" class="service-vendor">\n        {{$ctrl.serviceClass.vendor}}\n      </div>\n      <div ng-if="$ctrl.serviceClass.tags" class="order-service-tags">\n        <span ng-repeat="tag in $ctrl.serviceClass.tags" class="tag">\n          {{tag}}\n        </span>\n      </div>\n      <ul ng-if="$ctrl.docUrl || $ctrl.supportUrl" class="list-inline order-service-documentation-url">\n        <li ng-if="$ctrl.docUrl" >\n          <a ng-href="{{$ctrl.docUrl}}" target="_blank" class="learn-more-link">View Documentation <i class="fa fa-external-link" aria-hidden="true"></i></a>\n        </li>\n        <li ng-if="$ctrl.supportUrl" >\n          <a ng-href="{{$ctrl.supportUrl}}" target="_blank" class="learn-more-link">Get Support <i class="fa fa-external-link" aria-hidden="true"></i></a>\n        </li>\n      </ul>\n    </div>\n  </div>\n  <div class="order-service-description-block">\n    <p ng-if="!$ctrl.multipleServicePlans && ($ctrl.selectedPlan.spec.externalMetadata.displayName || $ctrl.selectedPlan.spec.description)">\n      <span ng-if="$ctrl.selectedPlan.spec.externalMetadata.displayName">\n        Plan {{$ctrl.selectedPlan.spec.externalMetadata.displayName}}\n        <span ng-if="$ctrl.selectedPlan.spec.description">&ndash;</span>\n      </span>\n      <span ng-if="$ctrl.selectedPlan.spec.description">{{$ctrl.selectedPlan.spec.description}}</span>\n    </p>\n    <p ng-if="!$ctrl.description && !$ctrl.longDescription" class="description">No description provided.</p>\n    <p ng-if="$ctrl.description" ng-bind-html="($ctrl.description | linky : \'_blank\')" class="description"></p>\n    <p ng-if="$ctrl.longDescription" ng-bind-html="$ctrl.longDescription | linky : \'_blank\'" class="description"></p>\n    <div ng-if="$ctrl.imageDependencies.length">\n      <div class="order-service-subheading">Image Dependencies</div>\n      <div ng-repeat="imageName in $ctrl.imageDependencies" class="order-service-dependent-image">\n        <span class="pficon pficon-image" aria-hidden="true"></span>\n        <span class="sr-only">Image</span>\n        {{imageName}}\n      </div>\n    </div>\n  </div>\n</div>\n';
 }, function(e, t) {
